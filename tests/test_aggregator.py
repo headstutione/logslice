@@ -66,3 +66,11 @@ def test_summary_includes_total_and_groups():
     assert summary["total"] == 2
     assert "groups" in summary
     assert summary["groups"]["web"] == 1
+
+
+def test_aggregate_empty_entries_returns_zero_total():
+    """Aggregating an empty list should return total=0 and no groups."""
+    agg = Aggregator(AggregationConfig(group_by="level"))
+    result = agg.aggregate([])
+    assert result.total == 0
+    assert result.groups == {}
