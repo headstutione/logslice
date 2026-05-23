@@ -68,3 +68,17 @@ def test_line_numbers_are_correct():
 def test_log_entry_str():
     entry = LogEntry(line_number=1, raw="hello\n")
     assert str(entry) == "hello"
+
+
+def test_empty_input_returns_no_entries():
+    """Parsing an empty sequence should yield no log entries."""
+    entries = _parse([])
+    assert entries == []
+
+
+def test_line_numbers_preserved_after_filtering():
+    """Line numbers should reflect original positions even when lines are filtered out."""
+    entries = _parse(SAMPLE_LINES, include="ERROR")
+    # ERROR lines are at positions 1 and 4 in SAMPLE_LINES
+    assert entries[0].line_number == 1
+    assert entries[1].line_number == 4
