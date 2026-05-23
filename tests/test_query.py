@@ -74,3 +74,19 @@ def test_query_limit():
 def test_empty_query_matches_all():
     entries = [make_entry("anything"), make_entry("else")]
     assert Query().apply(entries) == entries
+
+
+def test_query_multiple_conditions_all_must_match():
+    """All conditions in a Query are AND-ed together."""
+    entries = [
+        make_entry("ERROR critical"),
+        make_entry("ERROR minor"),
+        make_entry("INFO critical"),
+    ]
+    q = Query(conditions=[
+        QueryCondition("message", "contains", "ERROR"),
+        QueryCondition("message", "contains", "critical"),
+    ])
+    result = q.apply(entries)
+    assert len(result) == 1
+    assert result[0].message == "ERROR critical"
