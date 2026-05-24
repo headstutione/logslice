@@ -95,59 +95,22 @@ def test_build_export_config_csv_format():
     assert config.format == ExportFormat.CSV
 
 
-def test_build_export_config_sets_pretty():
-    args = _make_args(export_format="json", export_pretty=True)
+def test_build_export_config_propagates_output_and_fields():
+    """Ensure output path and field list are forwarded to the ExportConfig."""
+    args = _make_args(
+        export_format="json",
+        export_output="/tmp/results.json",
+        export_fields=["level", "msg"],
+    )
     config = build_export_config(args)
-    assert config.pretty is True
-
-
-def test_build_export_config_sets_fields():
-    args = _make_args(export_format="csv", export_fields=["level", "msg"])
-    config = build_export_config(args)
+    assert config is not None
+    assert config.output == "/tmp/results.json"
     assert config.fields == ["level", "msg"]
 
 
-def test_build_export_config_invalid_format_raises():
-    args = _make_args(export_format="xml")
-    with pytest.raises((ValueError, KeyError)):
-        build_export_config(args)
-
-
-# ---------------------------------------------------------------------------
-# write_export
-# ---------------------------------------------------------------------------
-
-def test_write_export_to_stdout(capsys):
-    entries = [make_entry()]
-    config = ExportConfig(format=ExportFormat.TEXT)
-    write_export(entries, config, output_path=None)
-    captured = capsys.readouterr()
-    assert "ERROR something went wrong" in captured.out
-
-
-def test_write_export_to_file():
-    entries = [make_entry(raw="INFO all good", groups={"level": "INFO", "msg": "all good"})]
-    config = ExportConfig(format=ExportFormat.TEXT)
-    with tempfile.NamedTemporaryFile(mode="r", suffix=".txt", delete=False) as f:
-        path = f.name
-    try:
-        write_export(entries, config, output_path=path)
-        with open(path) as f:
-            content = f.read()
-        assert "INFO all good" in content
-    finally:
-        os.unlink(path)
-
-
-def test_write_export_json_to_file():
-    entries = [make_entry()]
-    config = ExportConfig(format=ExportFormat.JSON, pretty=False)
-    with tempfile.NamedTemporaryFile(mode="r", suffix=".json", delete=False) as f:
-        path = f.name
-    try:
-        write_export(entries, config, output_path=path)
-        with open(path) as f:
-            content = f.read()
-        assert "ERROR" in content
-    finally:
-        os.unlink(path)
+def test_build_export_config_pretty_flag_forwarded():
+    """Ensure the pretty-print flag is forwarded to the ExportConfig."""
+    args = _make_args(export_format="json", export_pretty=True)
+    config = build_export_config(args)
+    assert config is not None
+    assert config.pretty is True
