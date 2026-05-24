@@ -47,8 +47,11 @@ class LogParser:
 
     def parse_file(self, filepath: str) -> Iterator[LogEntry]:
         """Open a file and yield matching LogEntry objects."""
-        with open(filepath, "r", errors="replace") as fh:
-            yield from self.parse_lines(fh)
+        try:
+            with open(filepath, "r", errors="replace") as fh:
+                yield from self.parse_lines(fh)
+        except OSError as exc:
+            raise OSError(f"Failed to open log file '{filepath}': {exc}") from exc
 
     def _try_match(self, line_number: int, raw: str) -> Optional[LogEntry]:
         groups: dict = {}
