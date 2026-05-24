@@ -41,6 +41,15 @@ class Formatter:
 class JsonFormatter:
     """Formats LogEntry objects as JSON lines."""
 
+    def __init__(self, indent: int = None):
+        """Initialize the JsonFormatter.
+
+        Args:
+            indent: If set, JSON output will be pretty-printed with the given
+                    indentation level. Defaults to None (compact output).
+        """
+        self.indent = indent
+
     def format_entry(self, entry: LogEntry) -> str:
         """Format a single LogEntry as a JSON string."""
         import json
@@ -51,7 +60,7 @@ class JsonFormatter:
         }
         if entry.groups:
             payload["groups"] = entry.groups
-        return json.dumps(payload)
+        return json.dumps(payload, indent=self.indent)
 
     def format_entries(self, entries: List[LogEntry]) -> List[str]:
         """Format a list of entries as a list of JSON strings."""
