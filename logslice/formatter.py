@@ -42,6 +42,7 @@ class JsonFormatter:
     """Formats LogEntry objects as JSON lines."""
 
     def format_entry(self, entry: LogEntry) -> str:
+        """Format a single LogEntry as a JSON string."""
         import json
 
         payload = {
@@ -52,5 +53,10 @@ class JsonFormatter:
             payload["groups"] = entry.groups
         return json.dumps(payload)
 
+    def format_entries(self, entries: List[LogEntry]) -> List[str]:
+        """Format a list of entries as a list of JSON strings."""
+        return [self.format_entry(e) for e in entries]
+
     def render(self, entries: List[LogEntry]) -> str:
-        return "\n".join(self.format_entry(e) for e in entries)
+        """Render all entries as a newline-delimited JSON (NDJSON) string."""
+        return "\n".join(self.format_entries(entries))
