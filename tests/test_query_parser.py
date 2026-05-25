@@ -60,3 +60,21 @@ def test_parse_and_apply_integration():
 def test_parse_value_with_spaces():
     q = parse_query("message:contains:disk full")
     assert q.conditions[0].value == "disk full"
+
+
+def test_parse_limit_zero_raises():
+    """A LIMIT of zero is nonsensical and should raise QueryParseError."""
+    with pytest.raises(QueryParseError, match="LIMIT"):
+        parse_query("message:contains:ERROR LIMIT 0")
+
+
+def test_parse_negative_limit_raises():
+    """A negative LIMIT value should raise QueryParseError."""
+    with pytest.raises(QueryParseError, match="LIMIT"):
+        parse_query("message:contains:ERROR LIMIT -5")
+
+
+def test_parse_non_integer_limit_raises():
+    """A non-integer LIMIT value should raise QueryParseError."""
+    with pytest.raises(QueryParseError, match="LIMIT"):
+        parse_query("message:contains:ERROR LIMIT ten")
